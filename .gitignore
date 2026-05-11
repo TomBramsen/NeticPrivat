@@ -6,3 +6,8 @@
 .gitignore
 .git
 _DS_Store
+._DS_Store
+.terraform/*
+.teerraform.lock.hcl
+terraform.tfstate
+terraform.tfstate.backup
