@@ -1,32 +1,9 @@
 
-######################################
-###          SSL for VMs           ###
-######################################
-
-# Generate SSH keypair
-resource "tls_private_key" "ssh_key" {
-  algorithm = "RSA"
-  rsa_bits  = 4096
-}
-
-# Save private key locally
-resource "local_file" "private_key" {
-  filename        = "${path.module}/id_rsa"
-  content         = tls_private_key.ssh_key.private_key_pem
-  file_permission = "0600"
-}
-
-# Upload public key til OVH/OpenStack
-resource "openstack_compute_keypair_v2" "default" {
-  name       = "terraform-generated-key"
-  public_key = tls_private_key.ssh_key.public_key_openssh
-}
-
 
 ######################################
 ###         Generate VMs           ###
 ######################################
-
+/*
 
 resource "openstack_compute_instance_v2" "VMs" {
   count           = var.ControlPlaneVM.count
@@ -35,14 +12,9 @@ resource "openstack_compute_instance_v2" "VMs" {
   image_name      = var.ControlPlaneVM.image_name
   key_pair        = openstack_compute_keypair_v2.default.name
   security_groups = ["default"]
-    network {
+  network {
     name = ovh_cloud_project_network_private.net.name
   }
-  /*
-network {
-  uuid = ovh_cloud_project_network_private.net.id
-}
-*/
   lifecycle {
     # OVHcloud regularly updates the base image of a given OS so that customer has less packages to update after spawning a new instance
     # To avoid terraform to have some issue with that, the following ignore_changes is required.
@@ -50,9 +22,6 @@ network {
       image_name
     ]
   }
-  depends_on = [
-  ovh_cloud_project_network_private_subnet.subnet
-]
 }
 
 
@@ -63,7 +32,7 @@ resource "openstack_compute_instance_v2" "VMPublicNet" {
   name            = "publicnet-${count.index}"
   flavor_name     = var.ControlPlaneVM.size
   image_name      = "Windows Server 2025 Standard (Desktop)"
-  admin_pass      = "Kodeord123!"
+  admin_pass      = "Kodeord1"
   security_groups = ["default"]
   network {
     name = ovh_cloud_project_network_private.net.name
@@ -110,3 +79,5 @@ output "vm_info" {
   ]
 }
 */
+
+
